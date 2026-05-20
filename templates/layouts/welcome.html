@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Bienvenido</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:40px 20px">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+
+          <tr>
+            <td style="background-color:{{if .brand_color}}{{.brand_color}}{{else}}#0e9f6e{{end}};padding:48px 32px" align="center">
+              {{if .logo_url}}
+              <img src="{{.logo_url}}" alt="logo" style="max-height:48px;margin-bottom:24px">
+              {{end}}
+              <div style="width:80px;height:80px;background-color:rgba(255,255,255,0.2);border-radius:50%;line-height:80px;text-align:center;margin:0 auto 20px;color:#ffffff;font-size:36px">
+                👋
+              </div>
+              <h1 style="margin:0;color:#ffffff;font-size:30px;font-weight:600;line-height:1.2">¡Hola, {{.name}}!</h1>
+              <p style="margin:12px 0 0;color:#ffffff;font-size:16px;opacity:0.9">
+                {{if .welcome_subtitle}}{{.welcome_subtitle}}{{else}}Bienvenido a la familia{{end}}
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:40px 32px 16px">
+              <p style="margin:0 0 16px;color:#374151;font-size:16px;line-height:1.7">{{.message}}</p>
+            </td>
+          </tr>
+
+          {{if .features}}
+          <tr>
+            <td style="padding:0 32px 24px">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{range .features}}
+                <tr>
+                  <td style="padding:12px 0;border-bottom:1px solid #f3f4f6">
+                    <table role="presentation" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding-right:12px;vertical-align:top">
+                          <div style="width:24px;height:24px;background-color:{{if $.brand_color}}{{$.brand_color}}{{else}}#0e9f6e{{end}};border-radius:50%;text-align:center;line-height:24px;color:#ffffff;font-size:14px;font-weight:bold">✓</div>
+                        </td>
+                        <td style="vertical-align:top">
+                          <p style="margin:0;color:#111827;font-size:15px;line-height:1.5">{{.}}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {{end}}
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .action_url}}
+          <tr>
+            <td style="padding:8px 32px 40px" align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background-color:{{if .brand_color}}{{.brand_color}}{{else}}#0e9f6e{{end}};border-radius:8px">
+                    <a href="{{.action_url}}" style="display:inline-block;padding:14px 40px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600">
+                      {{if .action_label}}{{.action_label}}{{else}}Comenzar{{end}}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          <tr>
+            <td style="padding:24px 32px;background-color:#f9fafb;border-top:1px solid #e5e7eb" align="center">
+              <p style="margin:0 0 8px;color:#6b7280;font-size:13px;line-height:1.6">
+                {{if .footer}}{{.footer}}{{else}}¿Necesitás ayuda? Estamos para vos.{{end}}
+              </p>
+              {{if .support_email}}
+              <p style="margin:0;color:#9ca3af;font-size:12px">
+                <a href="mailto:{{.support_email}}" style="color:#6b7280;text-decoration:underline">{{.support_email}}</a>
+              </p>
+              {{end}}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

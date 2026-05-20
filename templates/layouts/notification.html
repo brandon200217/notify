@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>{{.title}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:40px 20px">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+
+          <tr>
+            <td style="background-color:{{if .brand_color}}{{.brand_color}}{{else}}#1a56db{{end}};padding:32px 32px 24px" align="center">
+              {{if .logo_url}}
+              <img src="{{.logo_url}}" alt="logo" style="max-height:40px;margin-bottom:16px">
+              {{else}}
+              <p style="margin:0 0 8px;color:#ffffff;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:0.9">
+                {{if .brand}}{{.brand}}{{else}}Notificación{{end}}
+              </p>
+              {{end}}
+              <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:600;line-height:1.3">{{.title}}</h1>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:40px 32px">
+              {{if .greeting}}
+              <p style="margin:0 0 20px;color:#111827;font-size:18px;font-weight:500">{{.greeting}}</p>
+              {{end}}
+              <p style="margin:0 0 16px;color:#374151;font-size:16px;line-height:1.7">{{.message}}</p>
+              {{if .secondary_message}}
+              <p style="margin:16px 0 0;color:#6b7280;font-size:15px;line-height:1.7">{{.secondary_message}}</p>
+              {{end}}
+            </td>
+          </tr>
+
+          {{if .action_url}}
+          <tr>
+            <td style="padding:0 32px 32px" align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background-color:{{if .brand_color}}{{.brand_color}}{{else}}#1a56db{{end}};border-radius:8px">
+                    <a href="{{.action_url}}" style="display:inline-block;padding:14px 36px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600">
+                      {{if .action_label}}{{.action_label}}{{else}}Continuar{{end}}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .info_box}}
+          <tr>
+            <td style="padding:0 32px 32px">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#eff6ff;border-radius:8px">
+                <tr>
+                  <td style="padding:20px">
+                    {{if .info_box_title}}
+                    <p style="margin:0 0 8px;color:#1e40af;font-size:14px;font-weight:600">{{.info_box_title}}</p>
+                    {{end}}
+                    <p style="margin:0;color:#1e3a8a;font-size:14px;line-height:1.6">{{.info_box}}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          <tr>
+            <td style="padding:24px 32px;background-color:#f9fafb;border-top:1px solid #e5e7eb" align="center">
+              <p style="margin:0 0 8px;color:#6b7280;font-size:13px">
+                {{if .footer}}{{.footer}}{{else}}Si tenés alguna pregunta, contactanos.{{end}}
+              </p>
+              {{if .company_name}}
+              <p style="margin:0;color:#9ca3af;font-size:12px">© {{.company_name}}</p>
+              {{end}}
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

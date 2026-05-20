@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>{{.title}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:40px 20px">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)">
+
+          <tr>
+            <td style="background-color:{{if .brand_color}}{{.brand_color}}{{else}}#1e2a3a{{end}};padding:32px">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 8px;color:#ffffff;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;opacity:0.8">
+                      {{if .brand}}{{.brand}}{{else}}Reporte{{end}}
+                    </p>
+                    <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:600">{{.title}}</h1>
+                    {{if .period}}
+                    <p style="margin:8px 0 0;color:#ffffff;font-size:14px;opacity:0.85">{{.period}}</p>
+                    {{end}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          {{if .summary}}
+          <tr>
+            <td style="padding:32px 32px 0">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  {{range .summary}}
+                  <td style="padding:0 8px;width:33%" valign="top">
+                    <div style="background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;text-align:center">
+                      <p style="margin:0 0 4px;color:#6b7280;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px">{{.label}}</p>
+                      <p style="margin:0;color:#111827;font-size:22px;font-weight:600">{{.value}}</p>
+                    </div>
+                  </td>
+                  {{end}}
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .intro}}
+          <tr>
+            <td style="padding:32px 32px 16px">
+              <p style="margin:0;color:#374151;font-size:15px;line-height:1.7">{{.intro}}</p>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .rows}}
+          <tr>
+            <td style="padding:24px 32px">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+                <thead>
+                  <tr>
+                    {{range .headers}}
+                    <th style="padding:14px 16px;background-color:#f9fafb;color:#374151;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;text-align:left;border-bottom:1px solid #e5e7eb">{{.}}</th>
+                    {{end}}
+                  </tr>
+                </thead>
+                <tbody>
+                  {{range $i, $row := .rows}}
+                  <tr style="background-color:{{if eq (mod $i 2) 0}}#ffffff{{else}}#f9fafb{{end}}">
+                    {{range $row}}
+                    <td style="padding:14px 16px;color:#111827;font-size:14px;border-bottom:1px solid #f3f4f6">{{.}}</td>
+                    {{end}}
+                  </tr>
+                  {{end}}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .conclusion}}
+          <tr>
+            <td style="padding:0 32px 24px">
+              <div style="padding:16px 20px;background-color:#eff6ff;border-left:3px solid #1a56db;border-radius:4px">
+                <p style="margin:0;color:#1e3a8a;font-size:14px;line-height:1.6">{{.conclusion}}</p>
+              </div>
+            </td>
+          </tr>
+          {{end}}
+
+          {{if .action_url}}
+          <tr>
+            <td style="padding:0 32px 32px" align="left">
+              <a href="{{.action_url}}" style="display:inline-block;padding:12px 28px;background-color:{{if .brand_color}}{{.brand_color}}{{else}}#1e2a3a{{end}};color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600">
+                {{if .action_label}}{{.action_label}}{{else}}Ver reporte completo{{end}}
+              </a>
+            </td>
+          </tr>
+          {{end}}
+
+          <tr>
+            <td style="padding:24px 32px;background-color:#f9fafb;border-top:1px solid #e5e7eb">
+              <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.5">
+                {{if .footer}}{{.footer}}{{else}}Reporte generado automáticamente.{{end}}
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
