@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	netmail "net/mail"
+)
 
 type NotifyRequest struct {
 	Source string `json:"source"`
@@ -52,6 +55,26 @@ func (r *NotifyRequest) validateMail() error {
 	if len(r.Receivers) == 0 {
 		return fmt.Errorf("mail requiere al menos un receiver")
 	}
+
+	// Validar formato de cada email
+	for _, addr := range r.Receivers {
+		if _, err := netmail.ParseAddress(addr); err != nil {
+			return fmt.Errorf("email inválido en receivers: %s", addr)
+		}
+	}
+
+	// Validar también CC y BCC si vienen
+	for _, addr := range r.Cc {
+		if _, err := netmail.ParseAddress(addr); err != nil {
+			return fmt.Errorf("email inválido en cc: %s", addr)
+		}
+	}
+	for _, addr := range r.Bcc {
+		if _, err := netmail.ParseAddress(addr); err != nil {
+			return fmt.Errorf("email inválido en bcc: %s", addr)
+		}
+	}
+
 	if r.Subject == "" {
 		return fmt.Errorf("mail requiere subject")
 	}

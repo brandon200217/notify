@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"crypto/subtle"
 	"encoding/json"
 	"log"
@@ -48,24 +47,10 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ch.Send(context.Background(), &req); err != nil {
+	if err := ch.Send(r.Context(), &req); err != nil {
 		respondError(w, http.StatusInternalServerError, "error al enviar notificación")
 		return
 	}
 
 	respondOK(w, req.Source)
-}
-
-func respondError(w http.ResponseWriter, status int, msg string) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error":  msg,
-		"status": status,
-	})
-}
-
-func respondOK(w http.ResponseWriter, source string) {
-	json.NewEncoder(w).Encode(map[string]string{
-		"source": source,
-	})
 }

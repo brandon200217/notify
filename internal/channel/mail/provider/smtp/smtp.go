@@ -36,6 +36,11 @@ func New(cfg Config) *SMTPProvider {
 }
 
 func (p *SMTPProvider) Send(ctx context.Context, email *provider.Email) error {
+
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("operación cancelada: %w", err)
+	}
+
 	server := mail.NewSMTPClient()
 	server.Host = p.host
 	server.Port = p.port
@@ -51,6 +56,10 @@ func (p *SMTPProvider) Send(ctx context.Context, email *provider.Email) error {
 		return fmt.Errorf("error conectando a SMTP: %w", err)
 	}
 	defer smtpClient.Close()
+
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("operación cancelada después de conectar: %w", err)
+	}
 
 	msg := p.buildMessage(email)
 
