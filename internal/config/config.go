@@ -29,6 +29,13 @@ type Config struct {
 	// Logging
 	LogPath  string
 	LogLevel string
+
+	// Mail
+	MailProvider string
+
+	// Límites
+	MaxRequestSizeMB    int
+	MaxAttachmentSizeMB int
 }
 
 func Load() (*Config, error) {
@@ -44,6 +51,9 @@ func Load() (*Config, error) {
 		LogPath:             utilities.GetEnvOrDefault("LOG_PATH", "./"),
 		LogLevel:            utilities.GetEnvOrDefault("LOG_LEVEL", "ERROR"),
 		SMTPFrom:            utilities.GetEnvOrDefault("SMTP_FROM", ""),
+		MailProvider:        utilities.GetEnvOrDefault("MAIL_PROVIDER", "smtp"),
+		MaxRequestSizeMB:    utilities.GetEnvOrDefaultInt("MAX_REQUEST_SIZE_MB", 25),
+		MaxAttachmentSizeMB: utilities.GetEnvOrDefaultInt("MAX_ATTACHMENT_SIZE_MB", 10),
 	}
 
 	if err := cfg.validate(); err != nil {

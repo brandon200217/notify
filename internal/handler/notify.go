@@ -2,25 +2,38 @@ package handler
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/brandon200217/NOTIFY/internal/models"
+	"github.com/brandon200217/NOTIFY/utilities"
 )
 
 func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	maxBytes := int64(s.cfg.MaxRequestSizeMB) << 20
+	r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+
+	token := utilities.ExtractBearerToken(r)
+	if token == "" {
+		respondError(w, http.StatusUnauthorized, "header Authorization requerido")
+		return
+	}
+
+	provided := []byte(token)
+	expected := []byte(s.cfg.NotifierToken)
+
+	if subtle.ConstantTimeCompare(provided, expected) != 1 {
+		respondError(w, http.StatusBadRequest, "request inválido")
+	}
+
 	var req models.NotifyRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Printf("error decode: %v", err)
 		respondError(w, http.StatusBadRequest, "request inválido")
-		return
-	}
-
-	if req.Token != s.cfg.NotifierToken {
-		respondError(w, http.StatusUnauthorized, "token inválido")
 		return
 	}
 
@@ -40,7 +53,6 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// acá va el dispatch al channel — próximo paso
 	respondOK(w, req.Source)
 }
 

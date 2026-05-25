@@ -4,99 +4,73 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"time"
 
+	"github.com/brandon200217/NOTIFY/internal/channel/mail/provider"
 	"github.com/brandon200217/NOTIFY/internal/config"
 	"github.com/brandon200217/NOTIFY/internal/models"
 	"github.com/brandon200217/NOTIFY/templates"
-	mail "github.com/xhit/go-simple-mail/v2"
 )
 
 type MailChannel struct {
-	cfg    *config.Config
-	engine *templates.Engine
+	provider           provider.MailProvider
+	engine             *templates.Engine
+	maxAttachmentBytes int
 }
 
-func NewMailChannel(cfg *config.Config, engine *templates.Engine) *MailChannel {
-	return &MailChannel{cfg: cfg, engine: engine}
+func NewMailChannel(cfg *config.Config, p provider.MailProvider, engine *templates.Engine, maxAttachmentMB int) *MailChannel {
+	return &MailChannel{
+		provider:           p,
+		engine:             engine,
+		maxAttachmentBytes: maxAttachmentMB << 20,
+	}
 }
 
 func (m *MailChannel) Send(ctx context.Context, req *models.NotifyRequest) error {
-	client, err := m.newClient()
-	if err != nil {
-		return fmt.Errorf("error conectando al servidor SMTP: %w", err)
-	}
-
-	smtpClient, err := client.Connect()
-	if err != nil {
-		return fmt.Errorf("error estableciendo conexión SMTP: %w", err)
-	}
-	defer smtpClient.Close()
-
 	email, err := m.buildEmail(req)
 	if err != nil {
 		return fmt.Errorf("error construyendo email: %w", err)
 	}
-	if err := email.Send(smtpClient); err != nil {
-		return fmt.Errorf("error enviando email: %w", err)
-	}
 
-	return nil
+	return m.provider.Send(ctx, email)
 }
 
-func (m *MailChannel) newClient() (*mail.SMTPServer, error) {
-	server := mail.NewSMTPClient()
-	server.Host = m.cfg.SMTPHost
-	server.Port = m.cfg.SMTPPort
-	server.Username = m.cfg.SMTPUsername
-	server.Password = m.cfg.SMTPPassword
-	server.Encryption = mail.EncryptionSTARTTLS
-	server.KeepAlive = false
-	server.ConnectTimeout = 10 * time.Second
-	server.SendTimeout = 10 * time.Second
-	return server, nil
-}
-
-func (m *MailChannel) buildEmail(req *models.NotifyRequest) (*mail.Email, error) {
-	email := mail.NewMSG()
-
-	email.SetFrom(m.cfg.SMTPFrom)
-	email.AddTo(req.Receivers...)
-	email.SetSubject(req.Subject)
-	email.SetBody(mail.TextHTML, req.Body)
-
-	body := req.Body
-	if req.TemplateID != "" {
-		rendered, err := m.engine.Render(req.TemplateID, req.TemplateData)
-		if err != nil {
-			return nil, err
-		}
-		body = rendered
+func (m *MailChannel) buildEmail(req *models.NotifyRequest) (*provider.Email, error) {
+	body, err := m.resolveBody(req)
+	if err != nil {
+		return nil, err
 	}
 
-	email.SetBody(mail.TextHTML, body)
-
-	// CC y BCC opcionales
-	if len(req.Cc) > 0 {
-		email.AddCc(req.Cc...)
-	}
-	if len(req.Bcc) > 0 {
-		email.AddBcc(req.Bcc...)
+	email := &provider.Email{
+		To:       req.Receivers,
+		Cc:       req.Cc,
+		Bcc:      req.Bcc,
+		Subject:  req.Subject,
+		HTMLBody: body,
 	}
 
-	// adjuntos opcionales
 	for _, att := range req.Attachments {
 		decoded, err := base64.StdEncoding.DecodeString(att.Base64Content)
 		if err != nil {
-			continue
+			return nil, fmt.Errorf("error decodificando adjunto %s: %w", att.Filename, err)
 		}
-		email.Attach(&mail.File{
-			Name:     att.Filename,
+
+		if len(decoded) > m.maxAttachmentBytes {
+			return nil, fmt.Errorf("Attachments supera 10mb")
+		}
+
+		email.Attachments = append(email.Attachments, provider.Attachment{
+			Filename: att.Filename,
 			MimeType: att.MimeType,
-			Data:     decoded,
-			Inline:   false,
+			Content:  decoded,
 		})
 	}
 
 	return email, nil
+}
+
+func (m *MailChannel) resolveBody(req *models.NotifyRequest) (string, error) {
+	if req.TemplateID != "" {
+		return m.engine.Render(req.TemplateID, req.TemplateData)
+	}
+	return req.Body, nil
 }
