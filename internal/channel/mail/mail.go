@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/brandon200217/NOTIFY/internal/channel/mail/provider"
 	"github.com/brandon200217/NOTIFY/internal/config"
 	"github.com/brandon200217/NOTIFY/internal/models"
 	"github.com/brandon200217/NOTIFY/templates"
+	"github.com/gabriel-vasile/mimetype"
 )
 
 type MailChannel struct {
@@ -58,6 +60,12 @@ func (m *MailChannel) buildEmail(req *models.NotifyRequest) (*provider.Email, er
 			return nil, fmt.Errorf("Attachments supera 10mb")
 		}
 
+		mtype := mimetype.Detect(decoded)
+		if !mimeMatches(att.MimeType, mtype.String()) {
+			return nil, fmt.Errorf("mime type declarado (%s) no coincide con el contenido real (%s) en %s",
+				att.MimeType, mtype.String(), att.Filename)
+		}
+
 		email.Attachments = append(email.Attachments, provider.Attachment{
 			Filename: att.Filename,
 			MimeType: att.MimeType,
@@ -73,4 +81,22 @@ func (m *MailChannel) resolveBody(req *models.NotifyRequest) (string, error) {
 		return m.engine.Render(req.TemplateID, req.TemplateData)
 	}
 	return req.Body, nil
+}
+
+func mimeMatches(declared, detected string) bool {
+	declaredBase := stripMimeParams(declared)
+	detectedBase := stripMimeParams(detected)
+
+	if detectedBase == "application/octet-stream" {
+		return true
+	}
+
+	return declaredBase == detectedBase
+}
+
+func stripMimeParams(mimeType string) string {
+	if idx := strings.Index(mimeType, ";"); idx != -1 {
+		return strings.TrimSpace(mimeType[:idx])
+	}
+	return strings.TrimSpace(mimeType)
 }

@@ -3,7 +3,7 @@ package handler
 import (
 	"crypto/subtle"
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/brandon200217/NOTIFY/internal/models"
@@ -26,12 +26,17 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 	expected := []byte(s.cfg.NotifierToken)
 
 	if subtle.ConstantTimeCompare(provided, expected) != 1 {
-		respondError(w, http.StatusBadRequest, "request inválido")
+		slog.Warn("token inválido",
+			"remote_addr", r.RemoteAddr)
+		respondError(w, http.StatusUnauthorized, "token inválido")
+		return
 	}
 
 	var req models.NotifyRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Printf("error decode: %v", err)
+		slog.Error("error decodificando request",
+			"error", err.Error(),
+			"remote_addr", r.RemoteAddr)
 		respondError(w, http.StatusBadRequest, "request inválido")
 		return
 	}
@@ -48,9 +53,18 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := ch.Send(r.Context(), &req); err != nil {
+		slog.Error("error enviando notificación",
+			"source", req.Source,
+			"type", req.Type,
+			"error", err.Error())
 		respondError(w, http.StatusInternalServerError, "error al enviar notificación")
 		return
 	}
+	slog.Info("notificación procesada",
+		"source", req.Source,
+		"type", req.Type,
+		"receivers_count", len(req.Receivers),
+		"template_id", req.TemplateID)
 
 	respondOK(w, req.Source)
 }

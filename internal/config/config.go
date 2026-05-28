@@ -27,8 +27,14 @@ type Config struct {
 	NotifierToken string
 
 	// Logging
-	LogPath  string
-	LogLevel string
+	LogPath       string
+	LogLevel      string
+	LogFormat     string // "text" o "json"
+	LogFile       string // path al archivo; vacío = solo stdout
+	LogMaxSizeMB  int
+	LogMaxBackups int
+	LogMaxAgeDays int
+	LogCompress   bool
 
 	// Mail
 	MailProvider string
@@ -48,12 +54,18 @@ func Load() (*Config, error) {
 		SlackWebhookURL:     utilities.GetEnvOrDefault("SLACK_WEBHOOK_URL", ""),
 		DiscordChannelsPath: utilities.GetEnvOrDefault("DISCORD_CHANNELS_PATH", "./discord_channels.json"),
 		NotifierToken:       utilities.GetEnvOrDefault("NOTIFIER_TOKEN", ""),
-		LogPath:             utilities.GetEnvOrDefault("LOG_PATH", "./"),
-		LogLevel:            utilities.GetEnvOrDefault("LOG_LEVEL", "ERROR"),
 		SMTPFrom:            utilities.GetEnvOrDefault("SMTP_FROM", ""),
 		MailProvider:        utilities.GetEnvOrDefault("MAIL_PROVIDER", "smtp"),
 		MaxRequestSizeMB:    utilities.GetEnvOrDefaultInt("MAX_REQUEST_SIZE_MB", 25),
 		MaxAttachmentSizeMB: utilities.GetEnvOrDefaultInt("MAX_ATTACHMENT_SIZE_MB", 10),
+		LogPath:             utilities.GetEnvOrDefault("LOG_PATH", "./"),
+		LogLevel:            utilities.GetEnvOrDefault("LOG_LEVEL", "ERROR"),
+		LogFormat:           utilities.GetEnvOrDefault("LOG_FORMAT", "text"),
+		LogFile:             utilities.GetEnvOrDefault("LOG_FILE", ""),
+		LogMaxSizeMB:        utilities.GetEnvOrDefaultInt("LOG_MAX_SIZE_MB", 10),
+		LogMaxBackups:       utilities.GetEnvOrDefaultInt("LOG_MAX_BACKUPS", 5),
+		LogMaxAgeDays:       utilities.GetEnvOrDefaultInt("LOG_MAX_AGE_DAYS", 30),
+		LogCompress:         utilities.GetEnvOrDefaultBool("LOG_COMPRESS", true),
 	}
 
 	if err := cfg.validate(); err != nil {

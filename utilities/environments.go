@@ -1,40 +1,50 @@
 package utilities
 
 import (
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 )
 
-func GetEnvOrDefaultInt(envName string, defaultValue int) int {
-	if env := os.Getenv(envName); env == "" {
-
-		log.Printf("envName: %s - value: %s - Using default: %v", envName, env, defaultValue)
+func GetEnvOrDefault(envName string, defaultValue string) string {
+	env := strings.TrimSpace(os.Getenv(envName))
+	if env == "" {
+		slog.Debug("variable de entorno no seteada, usando default",
+			"var", envName,
+			"default", defaultValue)
 		return defaultValue
-	} else {
-		v, err := strconv.Atoi(env)
-		if err != nil {
-			log.Printf("envName: %s - value: %s - Invalid numeric value, using default: %v", envName, env, defaultValue)
-			return defaultValue
-		}
-		return v
 	}
+	return env
 }
 
-func GetEnvOrDefault(envName string, defaultValue string) string {
-	if env := os.Getenv(envName); env == "" {
-		log.Printf("envName: %s - value: %s - Using default: %s", envName, env, defaultValue)
+func GetEnvOrDefaultInt(envName string, defaultValue int) int {
+	env := strings.TrimSpace(os.Getenv(envName))
+	if env == "" {
+		slog.Debug("variable de entorno no seteada, usando default",
+			"var", envName,
+			"default", defaultValue)
 		return defaultValue
-	} else {
-		return env
 	}
+	v, err := strconv.Atoi(env)
+	if err != nil {
+		slog.Warn("valor numérico inválido en variable de entorno, usando default",
+			"var", envName,
+			"value", env,
+			"default", defaultValue,
+			"error", err.Error())
+		return defaultValue
+	}
+	return v
 }
 
 func GetEnvOrDefaultBool(envName string, defaultValue bool) bool {
-	if env := os.Getenv(envName); env == "" {
-		log.Printf("envName: %s - value: %s - Using default: %v", envName, env, defaultValue)
+	env := strings.TrimSpace(os.Getenv(envName))
+	if env == "" {
+		slog.Debug("variable de entorno no seteada, usando default",
+			"var", envName,
+			"default", defaultValue)
 		return defaultValue
-	} else {
-		return env == "true"
 	}
+	return env == "true"
 }
