@@ -42,6 +42,9 @@ type Config struct {
 	// Límites
 	MaxRequestSizeMB    int
 	MaxAttachmentSizeMB int
+
+	RateLimitRPS   float64
+	RateLimitBurst int
 }
 
 func Load() (*Config, error) {
@@ -66,6 +69,8 @@ func Load() (*Config, error) {
 		LogMaxBackups:       utilities.GetEnvOrDefaultInt("LOG_MAX_BACKUPS", 5),
 		LogMaxAgeDays:       utilities.GetEnvOrDefaultInt("LOG_MAX_AGE_DAYS", 30),
 		LogCompress:         utilities.GetEnvOrDefaultBool("LOG_COMPRESS", true),
+		RateLimitRPS:        utilities.GetEnvOrDefaultFloat("RATE_LIMIT_RPS", 10),
+		RateLimitBurst:      utilities.GetEnvOrDefaultInt("RATE_LIMIT_BURST", 20),
 	}
 
 	if err := cfg.validate(); err != nil {

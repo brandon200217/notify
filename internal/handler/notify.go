@@ -18,6 +18,8 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 
 	token := utilities.ExtractBearerToken(r)
 	if token == "" {
+		slog.WarnContext(r.Context(), "header Authorization faltante",
+			"remote_addr", r.RemoteAddr)
 		respondError(w, http.StatusUnauthorized, "header Authorization requerido")
 		return
 	}
@@ -26,7 +28,7 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 	expected := []byte(s.cfg.NotifierToken)
 
 	if subtle.ConstantTimeCompare(provided, expected) != 1 {
-		slog.Warn("token inválido",
+		slog.WarnContext(r.Context(), "token inválido",
 			"remote_addr", r.RemoteAddr)
 		respondError(w, http.StatusUnauthorized, "token inválido")
 		return
@@ -34,7 +36,7 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 
 	var req models.NotifyRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		slog.Error("error decodificando request",
+		slog.ErrorContext(r.Context(), "error decodificando request",
 			"error", err.Error(),
 			"remote_addr", r.RemoteAddr)
 		respondError(w, http.StatusBadRequest, "request inválido")
@@ -42,25 +44,33 @@ func (s *Server) handleNotify(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := req.Validate(); err != nil {
+		slog.WarnContext(r.Context(), "request inválido",
+			"source", req.Source,
+			"type", req.Type,
+			"error", err.Error())
 		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	ch, err := s.registry.Get(req.Type)
 	if err != nil {
+		slog.WarnContext(r.Context(), "canal no soportado",
+			"type", req.Type,
+			"source", req.Source)
 		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := ch.Send(r.Context(), &req); err != nil {
-		slog.Error("error enviando notificación",
+		slog.ErrorContext(r.Context(), "error enviando notificación",
 			"source", req.Source,
 			"type", req.Type,
 			"error", err.Error())
 		respondError(w, http.StatusInternalServerError, "error al enviar notificación")
 		return
 	}
-	slog.Info("notificación procesada",
+
+	slog.InfoContext(r.Context(), "notificación procesada",
 		"source", req.Source,
 		"type", req.Type,
 		"receivers_count", len(req.Receivers),

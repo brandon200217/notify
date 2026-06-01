@@ -12,6 +12,7 @@ import (
 	"github.com/brandon200217/NOTIFY/internal/config"
 	"github.com/brandon200217/NOTIFY/internal/handler"
 	"github.com/brandon200217/NOTIFY/internal/logger"
+	"github.com/brandon200217/NOTIFY/internal/middleware"
 	"github.com/brandon200217/NOTIFY/templates"
 )
 
@@ -54,7 +55,8 @@ func main() {
 	registry := channel.NewRegistry()
 	registry.Register("mail", mailChannel)
 
-	srv := handler.NewServer(cfg, registry)
+	rate := middleware.NewRateLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst)
+	srv := handler.NewServer(cfg, registry, rate)
 
 	slog.Info("server escuchando", "port", cfg.ServerPort)
 	if err := http.ListenAndServe(cfg.ServerPort, srv.Router()); err != nil {

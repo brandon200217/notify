@@ -27,19 +27,20 @@ func New(cfg Config) *slog.Logger {
 
 	writer := buildWriter(cfg)
 
-	var handler slog.Handler
+	var baseHandler slog.Handler
 	if cfg.Format == "text" {
-		handler = tint.NewHandler(writer, &tint.Options{
+		baseHandler = tint.NewHandler(writer, &tint.Options{
 			Level:      level,
 			TimeFormat: time.TimeOnly,
 			AddSource:  false,
 		})
 	} else {
-		handler = slog.NewJSONHandler(writer, &slog.HandlerOptions{
+		baseHandler = slog.NewJSONHandler(writer, &slog.HandlerOptions{
 			Level:     level,
 			AddSource: false,
 		})
 	}
+	handler := &ContextHandler{Handler: baseHandler}
 
 	return slog.New(handler)
 }

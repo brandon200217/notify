@@ -5,19 +5,22 @@ import (
 
 	"github.com/brandon200217/NOTIFY/internal/channel"
 	"github.com/brandon200217/NOTIFY/internal/config"
+	"github.com/brandon200217/NOTIFY/internal/middleware"
 )
 
 type Server struct {
-	cfg      *config.Config
-	router   *http.ServeMux
-	registry *channel.Registry
+	cfg         *config.Config
+	router      *http.ServeMux
+	registry    *channel.Registry
+	rateLimiter *middleware.RateLimiter
 }
 
-func NewServer(cfg *config.Config, registry *channel.Registry) *Server {
+func NewServer(cfg *config.Config, registry *channel.Registry, rateLimiter *middleware.RateLimiter) *Server {
 	s := &Server{
-		cfg:      cfg,
-		router:   http.NewServeMux(),
-		registry: registry,
+		cfg:         cfg,
+		router:      http.NewServeMux(),
+		registry:    registry,
+		rateLimiter: rateLimiter,
 	}
 	s.registerRoutes()
 	return s
@@ -28,5 +31,8 @@ func (s *Server) Router() http.Handler {
 }
 
 func (s *Server) registerRoutes() {
-	s.router.HandleFunc("POST /notify", s.handleNotify)
+	handler := http.HandlerFunc(s.handleNotify)
+	wrapped := middleware.RequestID(s.rateLimiter.MiddlewareLimit(handler))
+	s.router.Handle("POST /notify", wrapped)
+
 }

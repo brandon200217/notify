@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"log"
 	"log/slog"
 	"os"
 	"strconv"
@@ -47,4 +48,18 @@ func GetEnvOrDefaultBool(envName string, defaultValue bool) bool {
 		return defaultValue
 	}
 	return env == "true"
+}
+
+func GetEnvOrDefaultFloat(envName string, defaultValue float64) float64 {
+	env := strings.TrimSpace(os.Getenv(envName))
+	if env == "" {
+		log.Printf("envName: %s - Using default: %v", envName, defaultValue)
+		return defaultValue
+	}
+	v, err := strconv.ParseFloat(env, 64)
+	if err != nil {
+		log.Printf("envName: %s - value: %s - Invalid float, using default: %v", envName, env, defaultValue)
+		return defaultValue
+	}
+	return v
 }

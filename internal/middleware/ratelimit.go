@@ -37,7 +37,7 @@ func (rl *RateLimiter) getLimiter(token string) *rate.Limiter {
 	return limiter
 }
 
-func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
+func (rl *RateLimiter) MiddlewareLimit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := utilities.ExtractBearerToken(r)
 		if token == "" {
@@ -47,8 +47,7 @@ func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 
 		limiter := rl.getLimiter(token)
 		if !limiter.Allow() {
-			slog.Warn("rate limit excedido",
-				"remote_addr", r.RemoteAddr)
+			slog.WarnContext(r.Context(), "rate limit excedido", "remote_addr", r.RemoteAddr)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
