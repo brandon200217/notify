@@ -45,32 +45,37 @@ type Config struct {
 
 	RateLimitRPS   float64
 	RateLimitBurst int
+
+	SMTPConnectTimeoutSec int
+	SMTPSendTimeoutSec    int
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
-		ServerPort:          utilities.GetEnvOrDefault("SERVER_PORT", ":8080"),
-		SMTPHost:            utilities.GetEnvOrDefault("SMTP_HOST", ""),
-		SMTPPort:            utilities.GetEnvOrDefaultInt("SMTP_PORT", 587),
-		SMTPUsername:        utilities.GetEnvOrDefault("SMTP_USERNAME", ""),
-		SMTPPassword:        utilities.GetEnvOrDefault("SMTP_PASSWORD", ""),
-		SlackWebhookURL:     utilities.GetEnvOrDefault("SLACK_WEBHOOK_URL", ""),
-		DiscordChannelsPath: utilities.GetEnvOrDefault("DISCORD_CHANNELS_PATH", "./discord_channels.json"),
-		NotifierToken:       utilities.GetEnvOrDefault("NOTIFIER_TOKEN", ""),
-		SMTPFrom:            utilities.GetEnvOrDefault("SMTP_FROM", ""),
-		MailProvider:        utilities.GetEnvOrDefault("MAIL_PROVIDER", "smtp"),
-		MaxRequestSizeMB:    utilities.GetEnvOrDefaultInt("MAX_REQUEST_SIZE_MB", 25),
-		MaxAttachmentSizeMB: utilities.GetEnvOrDefaultInt("MAX_ATTACHMENT_SIZE_MB", 10),
-		LogPath:             utilities.GetEnvOrDefault("LOG_PATH", "./"),
-		LogLevel:            utilities.GetEnvOrDefault("LOG_LEVEL", "ERROR"),
-		LogFormat:           utilities.GetEnvOrDefault("LOG_FORMAT", "text"),
-		LogFile:             utilities.GetEnvOrDefault("LOG_FILE", ""),
-		LogMaxSizeMB:        utilities.GetEnvOrDefaultInt("LOG_MAX_SIZE_MB", 10),
-		LogMaxBackups:       utilities.GetEnvOrDefaultInt("LOG_MAX_BACKUPS", 5),
-		LogMaxAgeDays:       utilities.GetEnvOrDefaultInt("LOG_MAX_AGE_DAYS", 30),
-		LogCompress:         utilities.GetEnvOrDefaultBool("LOG_COMPRESS", true),
-		RateLimitRPS:        utilities.GetEnvOrDefaultFloat("RATE_LIMIT_RPS", 10),
-		RateLimitBurst:      utilities.GetEnvOrDefaultInt("RATE_LIMIT_BURST", 20),
+		ServerPort:            utilities.GetEnvOrDefault("SERVER_PORT", ":8080"),
+		SMTPHost:              utilities.GetEnvOrDefault("SMTP_HOST", ""),
+		SMTPPort:              utilities.GetEnvOrDefaultInt("SMTP_PORT", 587),
+		SMTPUsername:          utilities.GetEnvOrDefault("SMTP_USERNAME", ""),
+		SMTPPassword:          utilities.GetEnvOrDefault("SMTP_PASSWORD", ""),
+		SlackWebhookURL:       utilities.GetEnvOrDefault("SLACK_WEBHOOK_URL", ""),
+		DiscordChannelsPath:   utilities.GetEnvOrDefault("DISCORD_CHANNELS_PATH", "./discord_channels.json"),
+		NotifierToken:         utilities.GetEnvOrDefault("NOTIFIER_TOKEN", ""),
+		SMTPFrom:              utilities.GetEnvOrDefault("SMTP_FROM", ""),
+		MailProvider:          utilities.GetEnvOrDefault("MAIL_PROVIDER", "smtp"),
+		MaxRequestSizeMB:      utilities.GetEnvOrDefaultInt("MAX_REQUEST_SIZE_MB", 25),
+		MaxAttachmentSizeMB:   utilities.GetEnvOrDefaultInt("MAX_ATTACHMENT_SIZE_MB", 10),
+		LogPath:               utilities.GetEnvOrDefault("LOG_PATH", "./"),
+		LogLevel:              utilities.GetEnvOrDefault("LOG_LEVEL", "ERROR"),
+		LogFormat:             utilities.GetEnvOrDefault("LOG_FORMAT", "text"),
+		LogFile:               utilities.GetEnvOrDefault("LOG_FILE", ""),
+		LogMaxSizeMB:          utilities.GetEnvOrDefaultInt("LOG_MAX_SIZE_MB", 10),
+		LogMaxBackups:         utilities.GetEnvOrDefaultInt("LOG_MAX_BACKUPS", 5),
+		LogMaxAgeDays:         utilities.GetEnvOrDefaultInt("LOG_MAX_AGE_DAYS", 30),
+		LogCompress:           utilities.GetEnvOrDefaultBool("LOG_COMPRESS", true),
+		RateLimitRPS:          utilities.GetEnvOrDefaultFloat("RATE_LIMIT_RPS", 10),
+		RateLimitBurst:        utilities.GetEnvOrDefaultInt("RATE_LIMIT_BURST", 20),
+		SMTPConnectTimeoutSec: utilities.GetEnvOrDefaultInt("SMTP_CONNECT_TIMEOUT_SEC", 10),
+		SMTPSendTimeoutSec:    utilities.GetEnvOrDefaultInt("SMTP_SEND_TIMEOUT_SEC", 10),
 	}
 
 	if err := cfg.validate(); err != nil {

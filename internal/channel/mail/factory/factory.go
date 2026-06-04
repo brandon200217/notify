@@ -12,11 +12,13 @@ func NewMailProvider(cfg *config.Config) (provider.MailProvider, error) {
 	switch cfg.MailProvider {
 	case "smtp":
 		return smtp.New(smtp.Config{
-			Host:     cfg.SMTPHost,
-			Port:     cfg.SMTPPort,
-			Username: cfg.SMTPUsername,
-			Password: cfg.SMTPPassword,
-			From:     cfg.SMTPFrom,
+			Host:              cfg.SMTPHost,
+			Port:              cfg.SMTPPort,
+			Username:          cfg.SMTPUsername,
+			Password:          cfg.SMTPPassword,
+			From:              cfg.SMTPFrom,
+			ConnectTimeoutSec: cfg.SMTPConnectTimeoutSec,
+			SendTimeoutSec:    cfg.SMTPSendTimeoutSec,
 		}), nil
 
 	default:

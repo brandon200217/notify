@@ -10,28 +10,34 @@ import (
 )
 
 type SMTPProvider struct {
-	host     string
-	port     int
-	username string
-	password string
-	from     string
+	host           string
+	port           int
+	username       string
+	password       string
+	from           string
+	connectTimeout time.Duration
+	sendTimeout    time.Duration
 }
 
 type Config struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	From     string
+	Host              string
+	Port              int
+	Username          string
+	Password          string
+	From              string
+	ConnectTimeoutSec int
+	SendTimeoutSec    int
 }
 
 func New(cfg Config) *SMTPProvider {
 	return &SMTPProvider{
-		host:     cfg.Host,
-		port:     cfg.Port,
-		username: cfg.Username,
-		password: cfg.Password,
-		from:     cfg.From,
+		host:           cfg.Host,
+		port:           cfg.Port,
+		username:       cfg.Username,
+		password:       cfg.Password,
+		from:           cfg.From,
+		connectTimeout: time.Duration(cfg.ConnectTimeoutSec) * time.Second,
+		sendTimeout:    time.Duration(cfg.SendTimeoutSec) * time.Second,
 	}
 }
 
@@ -48,8 +54,8 @@ func (p *SMTPProvider) Send(ctx context.Context, email *provider.Email) error {
 	server.Password = p.password
 	server.Encryption = mail.EncryptionSTARTTLS
 	server.KeepAlive = false
-	server.ConnectTimeout = 10 * time.Second
-	server.SendTimeout = 10 * time.Second
+	server.ConnectTimeout = p.connectTimeout
+	server.SendTimeout = p.sendTimeout
 
 	smtpClient, err := server.Connect()
 	if err != nil {
