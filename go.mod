@@ -8,7 +8,7 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/stretchr/testify v1.11.1
 	github.com/xhit/go-simple-mail/v2 v2.16.0
-	golang.org/x/time v0.15.0
+	golang.org/x/time v0.11.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
