@@ -31,9 +31,7 @@ jobs:
         run: go test ./... -v -race
 
       - name: Cobertura de tests
-        run: |
-          go test ./... -coverprofile=coverage.out
-          go tool cover -func=coverage.out
+        run: go test ./internal/handler/... -cover
 
       - name: Lint
         uses: golangci/golangci-lint-action@v6
