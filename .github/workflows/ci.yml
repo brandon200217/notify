@@ -28,11 +28,12 @@ jobs:
         run: go build ./...
 
       - name: Tests
-        run: go test ./... -v -race -coverprofile=coverage.out
-
+        run: go test ./... -v -race
 
       - name: Cobertura de tests
-        run: go tool cover -func=coverage.out
+        run: |
+          go test ./... -coverprofile=coverage.out
+          go tool cover -func=coverage.out
 
       - name: Lint
         uses: golangci/golangci-lint-action@v6
